@@ -1,0 +1,19 @@
+[package]
+name = "sd_backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = {version = "0.8.8", features = ["ws","multipart","http2","macros"] }
+axum-extra = { version = "0.12.5", features = ["async-read-body", "cached", "cookie", "cookie-private", "error-response", "file-stream", "form", "handler", "middleware", "multipart", "optional-path", "protobuf", "query", "routing", "scheme", "typed-header", "typed-routing", "with-rejection"] }
+dotenv = "0.15.0"
+prost = "0.14.1"
+prost-types = "0.14.1"
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-native-tls"] }
+tokio = { version = "1.49.0", features = ["full"] }
+tracing = { version = "0.1.44", features = ["log", "async-await"] }
+tracing-appender = "0.2.4"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "chrono"] }
+
+[build-dependencies]
+prost-build = "0.14.1"

@@ -1,0 +1,39 @@
+[package]
+name = "db_manager"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+
+[dependencies]
+# sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-native-tls","all-databases"] }
+dotenvy = "0.15.7"
+tokio = { version = "1.49.0", features = ["full"] }
+tracing-subscriber = "0.3.22"
+tracing = { version = "0.1.44", features = ["async-await", "log"] }
+log = "0.4.29"
+
+[dependencies.sea-orm]
+version = "1.1.19"
+features=[
+    "default",
+    "runtime-tokio-native-tls",
+    "debug-print",
+    "mock",
+    "sqlx-all"
+]
+
+[dependencies.sea-orm-migration]
+version = "1.1.19"
+default-features = false
+features=[
+    "runtime-tokio-native-tls",
+    "sqlx-all",
+    "with-chrono",
+    "with-json",
+    "with-rust_decimal",
+    "with-time",
+    "with-uuid"
+]
+
+[dev-dependencies]

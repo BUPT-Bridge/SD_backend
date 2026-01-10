@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package sd_backend.notice;
+
+// [Authorize::Admin]
+message NoticeRequest {
+  string content = 1;
+}
+
+// [Authorize::None]
+message NoticeResponse {
+  string content = 1;
+}

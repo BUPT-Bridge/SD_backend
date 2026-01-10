@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sd_backend.slideshow;
+
+message Image {
+  string url = 1;
+  int32 index = 2;
+}
+
+// [Authorize::Admin]
+message SlideShowRequest {
+  repeated Image urls = 1;
+}
+
+// [Authorize::None]
+message SlideShowResponse {
+  repeated Image urls = 1;
+}

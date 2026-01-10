@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package sd_backend.policy;
+
+message PolicyType {
+  string index = 1;
+  string type = 2;
+}
+
+// [Authorize::Admin]
+message PolicyTypeRequest {
+  repeated PolicyType types = 1;
+}
+
+// [Authorize::User]
+message PolicyTypeResponse {
+  repeated PolicyType types = 1;
+}
+
+message PolicyFiles {
+  string title = 1;
+  string url = 2;
+}
+
+// [Authorize::Admin]
+//
+// User
+// GET Payload = {
+//  openid: string
+// }
+//
+// Admin
+// GET Payload = {
+//  openid: string
+//  ...
+// }
+message PolicyFilesRequest {
+  string type_string = 1;
+  repeated PolicyFiles files = 2;
+}
+
+// [Authorize::User]
+message PolicyFilesResponse {
+  repeated PolicyFiles files = 1;
+}

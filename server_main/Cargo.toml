@@ -1,0 +1,8 @@
+[package]
+name = "server_main"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+
+[dependencies]

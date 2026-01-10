@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package sd_backend.user;
+
+// [Authorize::Admin && Authorize::User]
+//
+// User
+// GET Payload = {
+//  openid: string
+// }
+//
+// Admin
+// GET Payload = {
+//  openid: string
+//  ...
+// }
+message UserRequest {
+  // [Authorize::Admin && Authorize::User]
+  string openid = 1;
+  optional string nickname = 2;
+  optional string name = 3;
+  optional string phone_number = 4;
+  optional string address = 5;
+  optional string community = 6;
+  // [Authorize::Admin]
+  optional string is_important = 7;
+}
+
+// [Authorize::User]
+message UserResponse {
+  string nickname = 1;
+  string name = 2;
+  string phone_number = 3;
+  string address = 4;
+  string community = 5;
+  string create_time = 6;
+  string is_important = 7;
+}

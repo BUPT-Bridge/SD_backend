@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package sd_backend.medical_service;
+
+message MedicalServiceType {
+  string index = 1;
+  string type = 2;
+}
+
+// [Authorize::Admin]
+message MedicalServiceTypeRequest {
+  repeated MedicalServiceType types = 1;
+}
+
+// [Authorize::User]
+message MedicalServiceTypeResponse {
+  repeated MedicalServiceType types = 1;
+}
+
+message MedicalServiceBlock {
+  string medical_name = 1;
+  string position = 2;
+  string telephone = 3;
+  message GlobalPosition {
+    string latitude = 1;
+    string longitude = 2;
+  }
+  GlobalPosition global_position = 4;
+  string service_time = 5;
+}
+
+// [Authorize::Admin]
+message MedicalServiceBlockRequest {
+  string type_string = 2;
+  repeated MedicalServiceBlock blocks = 1;
+}
+
+// [Authorize::User]
+message MedicalServiceBlockResponse {
+  repeated MedicalServiceBlock blocks = 1;
+}
