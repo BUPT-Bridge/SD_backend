@@ -1,12 +1,15 @@
-// src/migrator/m20220602_000001_create_bakery_table.rs (create new file)
-
 use sea_orm_migration::prelude::*;
 
 pub struct Migration;
 
 impl MigrationName for Migration {
     fn name(&self) -> &str {
-        "create_bakery_table"
+        let path = file!();
+        std::path::Path::new(path)
+            .file_stem()
+            .unwrap()
+            .to_str()
+            .unwrap()
     }
 }
 
