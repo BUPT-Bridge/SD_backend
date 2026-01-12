@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use user_auth::wx_auth::*;
 
 #[cfg(test)]
@@ -7,7 +7,8 @@ mod tests {
     #[tokio::test]
     async fn test_wx_auth_correct() {
         dotenv().ok();
-        let result = wx_auth_session_to_json("XXXXXXXX").await;
+        let js_code = std::env::var("TEST_SERVER_WX_JS_CODE").unwrap();
+        let result = wx_auth_session_to_json(&js_code).await;
         assert!(result.is_err());
     }
 }
