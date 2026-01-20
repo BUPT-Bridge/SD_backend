@@ -6,3 +6,7 @@ authors.workspace = true
 description.workspace = true
 
 [dependencies]
+axum = { version = "0.8.8", features = ["macros", "multipart", "ws"] }
+db_manager = { path = "../db_manager" }
+interface_types = { path = "../interface_types" }
+user_auth = { path = "../user_auth" }

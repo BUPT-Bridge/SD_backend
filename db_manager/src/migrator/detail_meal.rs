@@ -15,21 +15,32 @@ impl MigrationName for Migration {
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-    // Define how to apply this migration: Create the Bakery table.
+    // Define how to apply this migration: Create the DetailMeal table.
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
             .create_table(
                 Table::create()
-                    .table(Bakery::Table)
+                    .table(DetailMeal::Table)
                     .col(
-                        ColumnDef::new(Bakery::Id)
+                        ColumnDef::new(DetailMeal::Id)
                             .integer()
                             .not_null()
+                            .primary_key()
                             .auto_increment()
-                            .primary_key(),
+                            .unique_key(),
                     )
-                    .col(ColumnDef::new(Bakery::Name).string().not_null())
-                    .col(ColumnDef::new(Bakery::ProfitMargin).double().not_null())
+                    .col(
+                        ColumnDef::new(DetailMeal::Type)
+                            .string()
+                    )
+                    .col(
+                        ColumnDef::new(DetailMeal::DateTime)
+                            .string()
+                    )
+                    .col(
+                        ColumnDef::new(DetailMeal::MealInfo)
+                            .json()
+                    )
                     .to_owned(),
             )
             .await
@@ -38,15 +49,16 @@ impl MigrationTrait for Migration {
     // Define how to rollback this migration: Drop the Bakery table.
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(Bakery::Table).to_owned())
+            .drop_table(Table::drop().table(DetailMeal::Table).to_owned())
             .await
     }
 }
 
 #[derive(Iden)]
-pub enum Bakery {
+pub enum DetailMeal {
     Table,
     Id,
-    Name,
-    ProfitMargin,
+    Type, //早餐中餐或晚餐
+    DateTime,
+    MealInfo, //直接存入json
 }

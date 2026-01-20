@@ -15,14 +15,14 @@ impl MigrationName for Migration {
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-    // Define how to apply this migration: Create the Bakery table.
+    // Define how to apply this migration: Create the Feedback table.
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
             .create_table(
                 Table::create()
-                    .table(User::Table)
+                    .table(Feedback::Table)
                     .col(
-                        ColumnDef::new(User::Id)
+                        ColumnDef::new(Feedback::Id)
                             .integer()
                             .not_null()
                             .primary_key()
@@ -30,18 +30,17 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
-                        ColumnDef::new(User::OpenId)
+                        ColumnDef::new(Feedback::Type)
                             .string()
-                            .unique_key()
-                            .not_null(),
                     )
-                    .col(ColumnDef::new(User::Nickname).string())
-                    .col(ColumnDef::new(User::Avatar).string())
-                    .col(ColumnDef::new(User::Permission).integer().default(1))
-                    .col(ColumnDef::new(User::Name).string())
-                    .col(ColumnDef::new(User::PhoneNumber).string())
-                    .col(ColumnDef::new(User::Address).string())
-                    .col(ColumnDef::new(User::IsImportant).boolean().default(false))
+                    .col(
+                        ColumnDef::new(Feedback::Content)
+                            .string()
+                    )
+                    .col(ColumnDef::new(Feedback::CreatedTime)
+                        .timestamp_with_time_zone()
+                        .not_null()
+                        .default(Expr::current_timestamp()))
                     .to_owned(),
             )
             .await
@@ -50,22 +49,17 @@ impl MigrationTrait for Migration {
     // Define how to rollback this migration: Drop the Bakery table.
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(User::Table).to_owned())
+            .drop_table(Table::drop().table(Feedback::Table).to_owned())
             .await
     }
 }
 
 #[derive(Iden)]
-pub enum User {
+pub enum Feedback {
     Table,
     Id,
-    OpenId,
-    Nickname,
-    Name,
-    PhoneNumber,
-    Address,
-    Community,
-    IsImportant,
-    Avatar,
-    Permission,
+    Type,
+    Content,
+    Phone,
+    CreatedTime,
 }

@@ -20,9 +20,9 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(User::Table)
+                    .table(Slideshow::Table)
                     .col(
-                        ColumnDef::new(User::Id)
+                        ColumnDef::new(Slideshow::Id)
                             .integer()
                             .not_null()
                             .primary_key()
@@ -30,18 +30,15 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
-                        ColumnDef::new(User::OpenId)
+                        ColumnDef::new(Slideshow::Index)
                             .string()
-                            .unique_key()
-                            .not_null(),
+                    ) 
+                    .col(
+                        ColumnDef::new(Slideshow::CreateTime)
+                            .timestamp()
+                            .not_null()
+                            .default(Expr::current_timestamp())
                     )
-                    .col(ColumnDef::new(User::Nickname).string())
-                    .col(ColumnDef::new(User::Avatar).string())
-                    .col(ColumnDef::new(User::Permission).integer().default(1))
-                    .col(ColumnDef::new(User::Name).string())
-                    .col(ColumnDef::new(User::PhoneNumber).string())
-                    .col(ColumnDef::new(User::Address).string())
-                    .col(ColumnDef::new(User::IsImportant).boolean().default(false))
                     .to_owned(),
             )
             .await
@@ -50,22 +47,15 @@ impl MigrationTrait for Migration {
     // Define how to rollback this migration: Drop the Bakery table.
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(User::Table).to_owned())
+            .drop_table(Table::drop().table(Slideshow::Table).to_owned())
             .await
     }
 }
 
 #[derive(Iden)]
-pub enum User {
+pub enum Slideshow {
     Table,
     Id,
-    OpenId,
-    Nickname,
-    Name,
-    PhoneNumber,
-    Address,
-    Community,
-    IsImportant,
-    Avatar,
-    Permission,
+    Index, 
+    CreateTime,
 }

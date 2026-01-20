@@ -20,9 +20,9 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(User::Table)
+                    .table(AiChat::Table)
                     .col(
-                        ColumnDef::new(User::Id)
+                        ColumnDef::new(AiChat::Id)
                             .integer()
                             .not_null()
                             .primary_key()
@@ -30,18 +30,17 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
-                        ColumnDef::new(User::OpenId)
+                        ColumnDef::new(AiChat::Index)
                             .string()
-                            .unique_key()
-                            .not_null(),
                     )
-                    .col(ColumnDef::new(User::Nickname).string())
-                    .col(ColumnDef::new(User::Avatar).string())
-                    .col(ColumnDef::new(User::Permission).integer().default(1))
-                    .col(ColumnDef::new(User::Name).string())
-                    .col(ColumnDef::new(User::PhoneNumber).string())
-                    .col(ColumnDef::new(User::Address).string())
-                    .col(ColumnDef::new(User::IsImportant).boolean().default(false))
+                    .col(
+                        ColumnDef::new(AiChat::Openid)
+                            .string()
+                    )
+                    .col(
+                        ColumnDef::new(AiChat::LongContent)
+                            .string()
+                    )
                     .to_owned(),
             )
             .await
@@ -50,22 +49,16 @@ impl MigrationTrait for Migration {
     // Define how to rollback this migration: Drop the Bakery table.
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(User::Table).to_owned())
+            .drop_table(Table::drop().table(AiChat::Table).to_owned())
             .await
     }
 }
 
 #[derive(Iden)]
-pub enum User {
+pub enum AiChat {
     Table,
     Id,
-    OpenId,
-    Nickname,
-    Name,
-    PhoneNumber,
-    Address,
-    Community,
-    IsImportant,
-    Avatar,
-    Permission,
+    Index, // api返回的对话索引
+    Openid,
+    LongContent,
 }

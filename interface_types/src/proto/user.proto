@@ -24,6 +24,8 @@ message UserRequest {
   optional string community = 6;
   // [Authorize::Admin]
   optional string is_important = 7;
+  optional string avatar = 8;
+  optional string permission = 9;
 }
 
 // [Authorize::User]
@@ -35,4 +37,6 @@ message UserResponse {
   string community = 5;
   string create_time = 6;
   string is_important = 7;
+  string avatar = 8;
+  string permission = 9;
 }

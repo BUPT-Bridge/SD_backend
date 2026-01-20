@@ -11,7 +11,7 @@ use tracing_subscriber;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .init();
     let db_config = db_manager::config::DatabaseConfig::from_env().uri();
@@ -20,12 +20,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_connections(10)
         .min_connections(1)
         .sqlx_logging(false)
-        .sqlx_logging_level(log::LevelFilter::Info);
+        .sqlx_logging_level(log::LevelFilter::Debug);
     let db: DatabaseConnection = Database::connect(db_connection_options).await?;
 
     let schema_manager = SchemaManager::new(&db);
-    Migrator::refresh(&db).await?;
-    assert!(schema_manager.has_table("bakery").await?);
-    assert!(schema_manager.has_table("chef").await?);
+    // Migrator::refresh(&db).await?;
+    Migrator::up(&db, None).await?;
+    // assert!(schema_manager.has_table("bakery").await?);
+    // assert!(schema_manager.has_table("chef").await?);
     Ok(())
 }
