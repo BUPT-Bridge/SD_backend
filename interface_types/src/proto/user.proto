@@ -6,22 +6,22 @@ package sd_backend.user;
 //
 // User
 // GET Payload = {
-//  openid: string
+//  token: string
 // }
 //
 // Admin
 // GET Payload = {
-//  openid: string
+//  token: string
 //  ...
 // }
 message UserRequest {
   // [Authorize::Admin && Authorize::User]
-  string openid = 1;
+  optional string target_openid = 10;
   optional string nickname = 2;
   optional string name = 3;
   optional string phone_number = 4;
   optional string address = 5;
-  optional string community = 6;
+  // optional string community = 6;
   // [Authorize::Admin]
   optional string is_important = 7;
   optional string avatar = 8;
@@ -29,14 +29,22 @@ message UserRequest {
 }
 
 // [Authorize::User]
+message User {
+  // [Authorize::Admin && Authorize::User]
+  optional string token = 1;
+  optional string nickname = 2;
+  optional string name = 3;
+  optional string phone_number = 4;
+  optional string address = 5;
+  // optional string community = 6;
+  // [Authorize::Admin]
+  optional string is_important = 7;
+  optional string avatar = 8;
+  optional string permission = 9;
+}
+
 message UserResponse {
-  string nickname = 1;
-  string name = 2;
-  string phone_number = 3;
-  string address = 4;
-  string community = 5;
-  string create_time = 6;
-  string is_important = 7;
-  string avatar = 8;
-  string permission = 9;
+  optional User user = 1;
+  int32 code = 2;
+  string message = 3;
 }

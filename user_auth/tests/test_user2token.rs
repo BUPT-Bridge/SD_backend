@@ -11,7 +11,6 @@ fn set_secret() {
 
 fn make_user() -> User {
     User {
-        id: 42,
         open_id: "openid-123".to_string(),
         nickname: Some("alice".to_string()),
         avatar: Some("https://example.com/avatar.png".to_string()),
@@ -42,7 +41,6 @@ fn roundtrip_user_to_token_and_back() {
     let token = user2token(&user).expect("token generation should succeed");
     let parsed = token2user(&token).expect("token should parse back to user");
 
-    assert_eq!(parsed.id, user.id);
     assert_eq!(parsed.open_id, user.open_id);
     assert_eq!(parsed.nickname, user.nickname);
     assert_eq!(parsed.avatar, user.avatar);

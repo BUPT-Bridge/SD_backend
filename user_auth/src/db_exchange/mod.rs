@@ -8,7 +8,6 @@ pub const EXPIRATION_TIME: u64 = 36000; // 10 hour
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
-    pub id: i32,
     pub open_id: String,
     pub nickname: Option<String>,
     pub avatar: Option<String>,
@@ -48,3 +47,6 @@ pub fn now_timestamp() -> u64 {
 pub fn expiration_timestamp() -> u64 {
     now_timestamp() + EXPIRATION_TIME
 }
+
+pub use token2user::*;
+pub use user2token::*;

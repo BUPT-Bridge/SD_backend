@@ -23,7 +23,6 @@ fn with_secret<F: FnOnce() -> R, R>(secret: &str, f: F) -> R {
 
 fn make_user() -> User {
     User {
-        id: 1,
         open_id: "openid-abc".to_string(),
         nickname: Some("bob".to_string()),
         avatar: Some("avatar.png".to_string()),

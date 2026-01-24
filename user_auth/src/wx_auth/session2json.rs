@@ -7,12 +7,12 @@ use reqwest;
 ///
 /// 注意将
 ///
-/// GET <https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code>
+/// GET <BASE_URL>/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code>
 pub async fn wx_auth_session_to_json(js_code: &str) -> Result<WxAuthResponse, WxAuthError> {
     let wx_config = WxAuthServerConfig::from_env();
     let url = format!(
-        "https://api.weixin.qq.com/sns/jscode2session?appid={}&secret={}&js_code={}&grant_type=authorization_code",
-        wx_config.appid, wx_config.secret, js_code
+        "{}/sns/jscode2session?appid={}&secret={}&js_code={}&grant_type=authorization_code",
+        wx_config.base_url, wx_config.appid, wx_config.secret, js_code
     );
     let client = reqwest::Client::new();
     let response: WxAuthResponse = client.get(&url).send().await?.json().await?;

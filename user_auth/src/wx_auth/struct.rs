@@ -1,15 +1,20 @@
 use serde::Deserialize;
 
 /// 微信授权服务器配置
-/// 包括 appid和secret
+/// 包括 appid、secret和base_url
 pub struct WxAuthServerConfig {
     pub appid: String,
     pub secret: String,
+    pub base_url: String,
 }
 
 impl WxAuthServerConfig {
-    pub fn new(appid: String, secret: String) -> Self {
-        WxAuthServerConfig { appid, secret }
+    pub fn new(appid: String, secret: String, base_url: String) -> Self {
+        WxAuthServerConfig {
+            appid,
+            secret,
+            base_url,
+        }
     }
 
     /// 从环境变量中读取配置
@@ -18,7 +23,9 @@ impl WxAuthServerConfig {
     pub fn from_env() -> Self {
         let appid = std::env::var("SERVER_WX_APPID").expect("SERVER_WX_APPID not found");
         let secret = std::env::var("SERVER_WX_SECRET").expect("SERVER_WX_SECRET not found");
-        WxAuthServerConfig::new(appid, secret)
+        let base_url = std::env::var("SERVER_WX_BASEURL")
+            .unwrap_or_else(|_| "https://api.weixin.qq.com".to_string());
+        WxAuthServerConfig::new(appid, secret, base_url)
     }
 }
 
