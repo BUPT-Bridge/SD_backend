@@ -1,4 +1,4 @@
-pub mod router;
+mod router;
 
 use axum::Router;
 use db_manager::*;
@@ -6,6 +6,8 @@ use dotenvy::dotenv;
 use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use std::sync::Arc;
+#[allow(unused_imports)]
+use tower_http::trace::TraceLayer;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -19,7 +21,7 @@ async fn build_database_connection() -> DatabaseConnection {
         .max_connections(10)
         .min_connections(1)
         .sqlx_logging(false)
-        .sqlx_logging_level(log::LevelFilter::Info);
+        .sqlx_logging_level(log::LevelFilter::Warn);
 
     Database::connect(options)
         .await
@@ -30,6 +32,9 @@ async fn build_database_connection() -> DatabaseConnection {
 /// Downstream routers should be nested under `/api`.
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
     let database = build_database_connection().await;
 
     let state = AppState {
@@ -41,7 +46,10 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router());
 
-    let app = Router::new().nest("/api", api_router).with_state(state);
+    let app = Router::new()
+        .nest("/api", api_router)
+        .with_state(state)
+        .layer(TraceLayer::new_for_http());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
