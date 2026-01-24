@@ -7,7 +7,6 @@ description.workspace = true
 
 [dependencies]
 # sqlx = { version = "0.8.6", features = ["runtime-tokio", "tls-native-tls","all-databases"] }
-dotenvy = "0.15.7"
 tokio = { version = "1.49.0", features = ["full"] }
 tracing-subscriber = "0.3.22"
 tracing = { version = "0.1.44", features = ["async-await", "log"] }
@@ -37,3 +36,4 @@ features=[
 ]
 
 [dev-dependencies]
+dotenvy = "0.15.7"
