@@ -1,10 +1,12 @@
 mod router;
 
 use axum::Router;
+use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
 use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm_migration::prelude::*;
 use std::sync::Arc;
 #[allow(unused_imports)]
 use tower_http::trace::TraceLayer;
@@ -36,6 +38,8 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .with_max_level(tracing::Level::DEBUG)
         .init();
     let database = build_database_connection().await;
+
+    Migrator::refresh(&database).await?;
 
     let state = AppState {
         database: Arc::new(database),

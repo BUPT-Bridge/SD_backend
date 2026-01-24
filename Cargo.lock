@@ -2857,6 +2857,7 @@ dependencies = [
  "interface_types",
  "log",
  "sea-orm",
+ "sea-orm-migration",
  "serde",
  "tokio",
  "tower-http",
