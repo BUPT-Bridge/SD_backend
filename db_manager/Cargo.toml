@@ -9,7 +9,7 @@ description.workspace = true
 version = "1.1.19"
 features=[
     "default",
-    "runtime-tokio-native-tls",
+    "runtime-tokio-rustls",
     "debug-print",
     "mock",
     "sqlx-all"
@@ -19,7 +19,7 @@ features=[
 version = "1.1.19"
 default-features = false
 features=[
-    "runtime-tokio-native-tls",
+    "runtime-tokio-rustls",
     "sqlx-all",
     "with-chrono",
     "with-json",
