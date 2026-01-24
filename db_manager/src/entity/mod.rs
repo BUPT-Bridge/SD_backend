@@ -2,17 +2,17 @@
 
 pub mod prelude;
 
-pub mod communityservice;
+pub mod community_service;
 pub mod detail_meal;
-pub mod dinnerprovider;
+pub mod dinner_provider;
 pub mod feedback;
 pub mod health_guide_content;
 pub mod health_guide_type;
-pub mod medicalservice;
+pub mod medical_service;
 pub mod notice;
 pub mod policy_file;
 pub mod policy_type;
-pub mod resourceservice;
+pub mod resource_service;
 pub mod service_map_content;
 pub mod service_map_type;
 pub mod slideshow;

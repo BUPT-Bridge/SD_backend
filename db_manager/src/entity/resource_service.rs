@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-#[sea_orm(schema_name = "shangdi", table_name = "medicalservice")]
+#[sea_orm(schema_name = "shangdi", table_name = "resource_service")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
@@ -15,6 +15,7 @@ pub struct Model {
     #[sea_orm(column_type = "Float", nullable)]
     pub longitude: Option<f32>,
     pub service_time: Option<String>,
+    pub boss: Option<String>,
     pub create_time: DateTime,
 }
 

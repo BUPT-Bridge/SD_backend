@@ -24,8 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db: DatabaseConnection = Database::connect(db_connection_options).await?;
 
     let schema_manager = SchemaManager::new(&db);
-    // Migrator::refresh(&db).await?;
-    Migrator::up(&db, None).await?;
+    Migrator::refresh(&db).await?;
+    // Migrator::up(&db, None).await?;
     // assert!(schema_manager.has_table("bakery").await?);
     // assert!(schema_manager.has_table("chef").await?);
     Ok(())
