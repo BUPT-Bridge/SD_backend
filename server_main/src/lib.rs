@@ -5,6 +5,7 @@ use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
 use router::user;
+use router::notice;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::prelude::*;
 use std::sync::Arc;
@@ -48,14 +49,15 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let api_router = Router::new()
         .nest("/user", user::register_router())
         .nest("/user", user::login_router())
-        .nest("/user", user::modify_router());
+        .nest("/user", user::modify_router())
+        .nest("/notice", notice::notice_router());
 
     let app = Router::new()
         .nest("/api", api_router)
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
 
     axum::serve(listener, app).await?;
 

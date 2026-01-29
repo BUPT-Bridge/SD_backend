@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sd_backend.notice;
+
+// Admin only: Update notice content
+message NoticeRequest {
+  // [Authorize::Admin]
+  string content = 1;
+}
+
+// Notice information
+message Notice {
+  int32 id = 1;
+  string content = 2;
+}
+
+// Response for notice operations
+message NoticeResponse {
+  optional Notice notice = 1;
+  int32 code = 2;
+  string message = 3;
+}

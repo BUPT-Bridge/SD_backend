@@ -4,9 +4,6 @@ fn main() -> Result<()> {
         &[
             "src/proto/user.proto",
             "src/proto/notice.proto",
-            "src/proto/slideshow.proto",
-            "src/proto/policy.proto",
-            "src/proto/community_service.proto",
         ],
         &["src"],
     )?;
