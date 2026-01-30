@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod ai_chat;
 pub mod community_service;
 pub mod detail_meal;
 pub mod dinner_provider;
@@ -9,6 +10,7 @@ pub mod feedback;
 pub mod health_guide_content;
 pub mod health_guide_type;
 pub mod medical_service;
+pub mod mutil_media;
 pub mod notice;
 pub mod policy_file;
 pub mod policy_type;

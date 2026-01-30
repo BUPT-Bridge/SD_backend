@@ -41,6 +41,8 @@ impl MigratorTrait for Migrator {
             Box::new(service_map_content::Migration),
             Box::new(feedback::Migration),
             Box::new(user::Migration),
+            Box::new(ai_chat::Migration),
+            Box::new(mutil_media::Migration),
         ]
     }
 }

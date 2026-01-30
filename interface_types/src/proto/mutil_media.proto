@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sd_backend.mutil_media;
+
+// Request for uploading a media file (POST)
+// 包含二进制文件数据和原始文件名
+message MediaUploadRequest {
+  bytes file_data = 1;        // 二进制文件数据
+  string original_filename = 2; // 原始文件名
+}
+
+// Media information
+// 存储媒体的基本信息
+message Media {
+  string uuid = 1;            // 媒体的唯一标识符
+  string type = 2;            // 媒体类型（文件扩展名，如 "jpg", "png", "mp4" 等）
+}
+
+// Response for media operations (POST/GET with metadata)
+// 返回媒体信息、状态码和消息
+// 注意：GET 请求时，如果只需要元数据（用于关联表查询），返回此响应
+// 如果需要获取二进制数据，则直接返回二进制流，不使用此响应格式
+message MediaResponse {
+  optional Media media = 1;   // 媒体信息
+  int32 code = 2;             // 状态码（200=成功，其他为错误码）
+  string message = 3;         // 响应消息
+}

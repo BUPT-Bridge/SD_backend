@@ -4,8 +4,9 @@ use axum::Router;
 use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
-use router::user;
+use router::mutil_media;
 use router::notice;
+use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::prelude::*;
 use std::sync::Arc;
@@ -50,7 +51,8 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::register_router())
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router())
-        .nest("/notice", notice::notice_router());
+        .nest("/notice", notice::notice_router())
+        .nest("/mutil_media", mutil_media::mutil_media_router());
 
     let app = Router::new()
         .nest("/api", api_router)
