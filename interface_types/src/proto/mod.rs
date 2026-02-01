@@ -27,3 +27,15 @@ pub mod medical_service {
 pub mod feedback {
     include!(concat!(env!("OUT_DIR"), "/sd_backend.feedback.rs"));
 }
+
+pub mod dinner_provider {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.dinner_provider.rs"));
+}
+
+pub mod detail_meal {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.detail_meal.rs"));
+}
+
+pub mod apply_permission {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.apply_permission.rs"));
+}

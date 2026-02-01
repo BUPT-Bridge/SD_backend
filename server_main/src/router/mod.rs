@@ -1,4 +1,6 @@
 pub mod community_service;
+pub mod detail_meal;
+pub mod dinner_provider;
 pub mod feedback;
 pub mod medical_service;
 pub mod mutil_media;

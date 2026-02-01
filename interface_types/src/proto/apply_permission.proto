@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sd_backend.apply_permission;
+
+// ApplyPermission information
+message ApplyPermission {
+  string code = 1;
+  int32 apply_type = 2; // 2 or 3
+  int64 expire_time = 3; // unix timestamp seconds
+}
+
+// Request for applying permission (code verification)
+message ApplyPermissionRequest {
+  string code = 1;
+}
+
+// Response for apply permission operations
+message ApplyPermissionResponse {
+  ApplyPermission apply_permission = 1;
+  int32 code = 2;
+  string message = 3;
+}

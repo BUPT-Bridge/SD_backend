@@ -5,6 +5,8 @@ use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
 use router::community_service;
+use router::detail_meal;
+use router::dinner_provider;
 use router::feedback;
 use router::medical_service;
 use router::mutil_media;
@@ -56,6 +58,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::register_router())
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router())
+        .nest("/user", user::apply_permission_router())
         .nest("/notice", notice::notice_router())
         .nest("/mutil_media", mutil_media::mutil_media_router())
         .nest("/slide_show", slide_show::slide_show_router())
@@ -63,6 +66,11 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
             "/community_service",
             community_service::community_service_router(),
         )
+        .nest(
+            "/dinner_provider",
+            dinner_provider::dinner_provider_router(),
+        )
+        .nest("/detail_meal", detail_meal::detail_meal_router())
         .nest(
             "/resource_service",
             resource_service::resource_service_router(),

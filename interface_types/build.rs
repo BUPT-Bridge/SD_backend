@@ -10,6 +10,9 @@ fn main() -> Result<()> {
             "src/proto/resource_service.proto",
             "src/proto/medical_service.proto",
             "src/proto/feedback.proto",
+            "src/proto/dinner_provider.proto",
+            "src/proto/detail_meal.proto",
+            "src/proto/apply_permission.proto",
         ],
         &["src"],
     )?;

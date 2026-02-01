@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package sd_backend.detail_meal;
+
+// DetailMeal information
+message DetailMeal {
+  int32 id = 1;
+  string type = 2;
+  string date_time = 3;
+  string meal_info = 4; // JSON string
+  string belong_to = 5;
+}
+
+// Request for creating or modifying detail meal
+message DetailMealRequest {
+  int32 id = 1; // Required for PUT (modify)
+  string type = 2;
+  string date_time = 3;
+  string meal_info = 4; // JSON string
+  string belong_to = 5;
+}
+
+// Response for detail meal operations
+message DetailMealResponse {
+  repeated DetailMeal detail_meals = 1;
+  int32 code = 2;
+  string message = 3;
+}
