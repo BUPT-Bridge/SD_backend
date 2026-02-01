@@ -6,6 +6,7 @@ use db_manager::*;
 use dotenvy::dotenv;
 use router::mutil_media;
 use router::notice;
+use router::slide_show;
 use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::prelude::*;
@@ -52,7 +53,8 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router())
         .nest("/notice", notice::notice_router())
-        .nest("/mutil_media", mutil_media::mutil_media_router());
+        .nest("/mutil_media", mutil_media::mutil_media_router())
+        .nest("/slide_show", slide_show::slide_show_router());
 
     let app = Router::new()
         .nest("/api", api_router)

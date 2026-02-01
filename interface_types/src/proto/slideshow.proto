@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sd_backend.slideshow;
+
+// Slideshow information
+message Slideshow {
+  int32 id = 1;
+  string index = 2;
+  int64 create_time = 3;
+}
+
+// Response for slideshow operations
+message SlideshowResponse {
+  repeated Slideshow slideshows = 1;
+  int32 code = 2;
+  string message = 3;
+}

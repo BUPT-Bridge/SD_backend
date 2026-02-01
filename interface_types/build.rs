@@ -5,6 +5,7 @@ fn main() -> Result<()> {
             "src/proto/user.proto",
             "src/proto/notice.proto",
             "src/proto/mutil_media.proto",
+            "src/proto/slideshow.proto",
         ],
         &["src"],
     )?;
