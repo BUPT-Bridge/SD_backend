@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sd_backend.feedback;
+
+// Feedback information
+message Feedback {
+  int32 id = 1;
+  string type = 2;
+  string content = 3;
+  optional string phone = 4;
+  int64 created_time = 5;
+}
+
+// Request for creating feedback
+message FeedbackRequest {
+  string type = 1;
+  string content = 2;
+  optional string phone = 3;
+}
+
+// Request for exporting feedback
+message FeedbackExportRequest {
+  int64 start_time = 1;
+  int64 end_time = 2;
+}
+
+// Response for feedback operations
+message FeedbackResponse {
+  optional Feedback feedback = 1;
+  int32 code = 2;
+  string message = 3;
+}

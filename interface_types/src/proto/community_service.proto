@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sd_backend.community_service;
+
+// CommunityService information
+message CommunityService {
+  int32 id = 1;
+  string name = 2;
+  string address = 3;
+  string phone = 4;
+  float latitude = 5;
+  float longitude = 6;
+  int64 create_time = 7;
+}
+
+// Request for creating or modifying community service
+message CommunityServiceRequest {
+  // Optional fields - only provided fields will be updated
+  int32 id = 1; // Required for PUT (modify)
+  string name = 2;
+  string address = 3;
+  string phone = 4;
+  float latitude = 5;
+  float longitude = 6;
+}
+
+// Response for community service operations
+message CommunityServiceResponse {
+  repeated CommunityService community_services = 1;
+  int32 code = 2;
+  string message = 3;
+}

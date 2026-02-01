@@ -29,18 +29,10 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .unique_key(),
                     )
-                    .col(
-                        ColumnDef::new(DetailMeal::Type)
-                            .string()
-                    )
-                    .col(
-                        ColumnDef::new(DetailMeal::DateTime)
-                            .string()
-                    )
-                    .col(
-                        ColumnDef::new(DetailMeal::MealInfo)
-                            .json()
-                    )
+                    .col(ColumnDef::new(DetailMeal::Type).string())
+                    .col(ColumnDef::new(DetailMeal::DateTime).string())
+                    .col(ColumnDef::new(DetailMeal::MealInfo).json())
+                    .col(ColumnDef::new(DetailMeal::BelongTo).string())
                     .to_owned(),
             )
             .await
@@ -61,4 +53,5 @@ pub enum DetailMeal {
     Type, //早餐中餐或晚餐
     DateTime,
     MealInfo, //直接存入json
+    BelongTo,
 }

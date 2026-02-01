@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package sd_backend.resource_service;
+
+// ResourceService information
+message ResourceService {
+  int32 id = 1;
+  string name = 2;
+  string address = 3;
+  string phone = 4;
+  float latitude = 5;
+  float longitude = 6;
+  string service_time = 7;
+  string boss = 8;
+  int64 create_time = 9;
+}
+
+// Request for creating or modifying resource service
+message ResourceServiceRequest {
+  // Optional fields - only provided fields will be updated
+  int32 id = 1; // Required for PUT (modify)
+  string name = 2;
+  string address = 3;
+  string phone = 4;
+  float latitude = 5;
+  float longitude = 6;
+  string service_time = 7;
+  string boss = 8;
+}
+
+// Response for resource service operations
+message ResourceServiceResponse {
+  repeated ResourceService resource_services = 1;
+  int32 code = 2;
+  string message = 3;
+}

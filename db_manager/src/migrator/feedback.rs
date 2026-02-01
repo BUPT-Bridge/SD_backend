@@ -29,18 +29,15 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .unique_key(),
                     )
+                    .col(ColumnDef::new(Feedback::Type).string())
+                    .col(ColumnDef::new(Feedback::Content).string())
+                    .col(ColumnDef::new(Feedback::Phone).string())
                     .col(
-                        ColumnDef::new(Feedback::Type)
-                            .string()
+                        ColumnDef::new(Feedback::CreatedTime)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
                     )
-                    .col(
-                        ColumnDef::new(Feedback::Content)
-                            .string()
-                    )
-                    .col(ColumnDef::new(Feedback::CreatedTime)
-                        .timestamp_with_time_zone()
-                        .not_null()
-                        .default(Expr::current_timestamp()))
                     .to_owned(),
             )
             .await

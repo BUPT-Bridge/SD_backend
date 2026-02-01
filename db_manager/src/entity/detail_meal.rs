@@ -10,6 +10,7 @@ pub struct Model {
     pub r#type: Option<String>,
     pub date_time: Option<String>,
     pub meal_info: Option<Json>,
+    pub belong_to: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

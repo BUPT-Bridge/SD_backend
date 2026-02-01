@@ -4,8 +4,12 @@ use axum::Router;
 use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
+use router::community_service;
+use router::feedback;
+use router::medical_service;
 use router::mutil_media;
 use router::notice;
+use router::resource_service;
 use router::slide_show;
 use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
@@ -54,7 +58,20 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::modify_router())
         .nest("/notice", notice::notice_router())
         .nest("/mutil_media", mutil_media::mutil_media_router())
-        .nest("/slide_show", slide_show::slide_show_router());
+        .nest("/slide_show", slide_show::slide_show_router())
+        .nest(
+            "/community_service",
+            community_service::community_service_router(),
+        )
+        .nest(
+            "/resource_service",
+            resource_service::resource_service_router(),
+        )
+        .nest(
+            "/medical_service",
+            medical_service::medical_service_router(),
+        )
+        .nest("/feedback", feedback::feedback_router());
 
     let app = Router::new()
         .nest("/api", api_router)

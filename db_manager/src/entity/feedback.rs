@@ -9,6 +9,7 @@ pub struct Model {
     pub id: i32,
     pub r#type: Option<String>,
     pub content: Option<String>,
+    pub phone: Option<String>,
     pub created_time: DateTimeWithTimeZone,
 }
 

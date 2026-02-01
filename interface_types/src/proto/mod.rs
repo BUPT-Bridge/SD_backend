@@ -11,3 +11,19 @@ pub mod mutil_media {
 pub mod slideshow {
     include!(concat!(env!("OUT_DIR"), "/sd_backend.slideshow.rs"));
 }
+
+pub mod community_service {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.community_service.rs"));
+}
+
+pub mod resource_service {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.resource_service.rs"));
+}
+
+pub mod medical_service {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.medical_service.rs"));
+}
+
+pub mod feedback {
+    include!(concat!(env!("OUT_DIR"), "/sd_backend.feedback.rs"));
+}
