@@ -31,15 +31,15 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(HealthGuideContent::TypeOne)
-                            .string()
-                    )
-                    .col(
-                        ColumnDef::new(HealthGuideContent::TypeTwo)
-                            .string()
+                            .integer()  //匹配一级的type,即id
                     )
                     .col(
                         ColumnDef::new(HealthGuideContent::Content)
                             .json()
+                    )
+                    .col(
+                        ColumnDef::new(HealthGuideContent::TypeTwo) //二级Type的string
+                            .string()  
                     )
                     .to_owned(),
             )

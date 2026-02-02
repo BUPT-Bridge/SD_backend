@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sd_backend.service_map_type;
+
+message ServiceMapType {
+  int32 id = 1;
+  string community_name = 2;
+  int32 type_sum = 3;
+  string type_name = 4; // JSON string
+}
+
+message ServiceMapTypeRequest {
+  string community_name = 1;
+  int32 type_sum = 2;
+  string type_name = 3; // JSON string
+}
+
+message ServiceMapTypeResponse {
+  repeated ServiceMapType service_map_types = 1;
+  int32 code = 2;
+  string message = 3;
+}

@@ -32,7 +32,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(HealthGuideType::TypeName).string())
                     .col(ColumnDef::new(HealthGuideType::Icon).integer())
                     .col(ColumnDef::new(HealthGuideType::TypeSum).integer())
-                    .col(ColumnDef::new(HealthGuideType::TypeOne).string())
+                    .col(ColumnDef::new(HealthGuideType::TypeOne).json())
                     .to_owned(),
             )
             .await

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sd_backend.health_guide_type;
+
+message HealthGuideType {
+  int32 id = 1;
+  string type_name = 2;
+  int32 icon = 3;
+  int32 type_sum = 4;
+  string type_one = 5; // JSON string
+}
+
+message HealthGuideTypeRequest {
+  string type_name = 1;
+  int32 icon = 2;
+  int32 type_sum = 3;
+  string type_one = 4; // JSON string
+}
+
+message HealthGuideTypeResponse {
+  repeated HealthGuideType health_guide_types = 1;
+  int32 code = 2;
+  string message = 3;
+}

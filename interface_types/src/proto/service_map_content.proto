@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sd_backend.service_map_content;
+
+message ServiceMapContent {
+  int32 id = 1;
+  int32 type_one = 2;
+  string type_two = 3;
+  string content = 4; // JSON string
+}
+
+message ServiceMapContentRequest {
+  int32 type_one = 1;
+  string type_two = 2;
+  string content = 3; // JSON string
+}
+
+message ServiceMapContentResponse {
+  repeated ServiceMapContent service_map_contents = 1;
+  int32 code = 2;
+  string message = 3;
+}

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sd_backend.policy_type;
+
+message PolicyType {
+  int32 id = 1;
+  string type = 2;
+}
+
+message PolicyTypeRequest {
+  string type = 1;
+}
+
+message PolicyTypeResponse {
+  repeated PolicyType policy_types = 1;
+  int32 code = 2;
+  string message = 3;
+}

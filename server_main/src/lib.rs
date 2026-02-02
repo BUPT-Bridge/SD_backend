@@ -4,14 +4,21 @@ use axum::Router;
 use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
+use router::ai_chat;
 use router::community_service;
 use router::detail_meal;
 use router::dinner_provider;
 use router::feedback;
+use router::health_guide_content;
+use router::health_guide_type;
 use router::medical_service;
 use router::mutil_media;
 use router::notice;
+use router::policy_file;
+use router::policy_type;
 use router::resource_service;
+use router::service_map_content;
+use router::service_map_type;
 use router::slide_show;
 use router::user;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
@@ -59,6 +66,8 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router())
         .nest("/user", user::apply_permission_router())
+        .nest("/user", user::admin_manager_router())
+        .nest("/ai_chat", ai_chat::ai_chat_router())
         .nest("/notice", notice::notice_router())
         .nest("/mutil_media", mutil_media::mutil_media_router())
         .nest("/slide_show", slide_show::slide_show_router())
@@ -79,7 +88,25 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
             "/medical_service",
             medical_service::medical_service_router(),
         )
-        .nest("/feedback", feedback::feedback_router());
+        .nest("/feedback", feedback::feedback_router())
+        .nest(
+            "/service_map_type",
+            service_map_type::service_map_type_router(),
+        )
+        .nest(
+            "/health_guide_type",
+            health_guide_type::health_guide_type_router(),
+        )
+        .nest(
+            "/health_guide_content",
+            health_guide_content::health_guide_content_router(),
+        )
+        .nest(
+            "/service_map_content",
+            service_map_content::service_map_content_router(),
+        )
+        .nest("/policy_type", policy_type::policy_type_router())
+        .nest("/policy_file", policy_file::policy_file_router());
 
     let app = Router::new()
         .nest("/api", api_router)

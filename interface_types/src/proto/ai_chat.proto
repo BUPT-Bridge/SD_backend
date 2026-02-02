@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sd_backend.ai_chat;
+
+// AI Chat information
+message AiChat {
+  int32 id = 1;
+  optional string index = 2;
+}
+
+// Request for creating AI chat
+message AiChatRequest {
+  optional string index = 1;
+  optional string long_content = 2;
+}
+
+// Response for AI chat operations
+message AiChatResponse {
+  optional AiChat ai_chat = 1;
+  int32 code = 2;
+  string message = 3;
+}

@@ -39,7 +39,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(ServiceMapType::TypeName)
-                            .string()
+                            .json()
                     )
                     .to_owned(),
             )

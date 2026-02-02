@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sd_backend.policy_file;
+
+message PolicyFile {
+  int32 id = 1;
+  string title = 2;
+  string type = 3;
+  string index = 4;
+  int64 create_time = 5;
+}
+
+message PolicyFileRequest {
+  string title = 1;
+  string type = 2;
+  string index = 3;
+}
+
+message PolicyFileResponse {
+  repeated PolicyFile policy_files = 1;
+  int32 code = 2;
+  string message = 3;
+}

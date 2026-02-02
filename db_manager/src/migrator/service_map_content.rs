@@ -31,15 +31,15 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(ServiceMapContent::TypeOne)
-                            .string()
+                            .integer()  // 社区的id
                     )
                     .col(
                         ColumnDef::new(ServiceMapContent::TypeTwo)
-                            .string()
+                            .string()  //同ServiceMapType::TypeName即可，用这个来检索
                     )
                     .col(
                         ColumnDef::new(ServiceMapContent::Content)
-                            .json()
+                            .json()  // 细节的内容
                     )
                     .to_owned(),
             )
