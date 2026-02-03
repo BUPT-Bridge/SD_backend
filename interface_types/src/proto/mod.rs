@@ -36,10 +36,6 @@ pub mod detail_meal {
     include!(concat!(env!("OUT_DIR"), "/sd_backend.detail_meal.rs"));
 }
 
-pub mod apply_permission {
-    include!(concat!(env!("OUT_DIR"), "/sd_backend.apply_permission.rs"));
-}
-
 pub mod service_map_type {
     include!(concat!(env!("OUT_DIR"), "/sd_backend.service_map_type.rs"));
 }
@@ -68,10 +64,6 @@ pub mod policy_type {
 
 pub mod policy_file {
     include!(concat!(env!("OUT_DIR"), "/sd_backend.policy_file.rs"));
-}
-
-pub mod admin_manager {
-    include!(concat!(env!("OUT_DIR"), "/sd_backend.admin_manager.rs"));
 }
 
 pub mod ai_chat {

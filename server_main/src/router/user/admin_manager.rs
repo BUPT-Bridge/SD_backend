@@ -1,7 +1,7 @@
 use axum::{Router, extract::State, http::HeaderMap, routing::get};
 use axum_extra::protobuf::Protobuf;
 use db_manager::entity::user as user_entity;
-use interface_types::proto::admin_manager::{
+use interface_types::proto::user::{
     AdminManagedUser as ProtoAdminManagedUser, AdminManagerResponse,
 };
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};

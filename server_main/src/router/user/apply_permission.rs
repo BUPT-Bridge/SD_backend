@@ -6,7 +6,7 @@ use axum::{
 };
 use axum_extra::protobuf::Protobuf;
 use db_manager::entity::user as user_entity;
-use interface_types::proto::apply_permission::{
+use interface_types::proto::user::{
     ApplyPermission as ProtoApplyPermission, ApplyPermissionResponse,
 };
 use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, QueryFilter, Set};
