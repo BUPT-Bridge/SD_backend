@@ -16,18 +16,18 @@ pub fn router() -> Router<AppState> {
     Router::new().route("/", get(get_detail_meal))
 }
 
-/// 查询参数（可单可多，使用 & 传入多个）
-/// - belongto
-/// - datetime
-/// - type
+/// 查询参数（每个参数只能是单个值）
+/// - belongto: ?belongto=3
+/// - datetime: ?datetime=1月21日
+/// - type: ?type=早餐
 #[derive(Debug, Deserialize)]
 struct DetailMealQuery {
     #[serde(rename = "belongto")]
-    belong_to: Option<Vec<String>>,
+    belong_to: Option<String>,
     #[serde(rename = "datetime")]
-    date_time: Option<Vec<String>>,
+    date_time: Option<String>,
     #[serde(rename = "type")]
-    r#type: Option<Vec<String>>,
+    r#type: Option<String>,
 }
 
 /// GET /api/detail_meal - 获取明细餐列表（所有权限 0-3 都可以访问）
@@ -39,22 +39,16 @@ async fn get_detail_meal(
 
     let mut query = detail_meal_entity::Entity::find();
 
-    if let Some(values) = params.belong_to {
-        if !values.is_empty() {
-            query = query.filter(detail_meal_entity::Column::BelongTo.is_in(values));
-        }
+    if let Some(value) = params.belong_to {
+        query = query.filter(detail_meal_entity::Column::BelongTo.eq(value));
     }
 
-    if let Some(values) = params.date_time {
-        if !values.is_empty() {
-            query = query.filter(detail_meal_entity::Column::DateTime.is_in(values));
-        }
+    if let Some(value) = params.date_time {
+        query = query.filter(detail_meal_entity::Column::DateTime.eq(value));
     }
 
-    if let Some(values) = params.r#type {
-        if !values.is_empty() {
-            query = query.filter(detail_meal_entity::Column::Type.is_in(values));
-        }
+    if let Some(value) = params.r#type {
+        query = query.filter(detail_meal_entity::Column::Type.eq(value));
     }
 
     let detail_meals = match query.all(db.as_ref()).await {

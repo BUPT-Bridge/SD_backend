@@ -5,10 +5,7 @@
 //! - POST /api/policy_file - 创建新的政策文件（仅 Admin 权限，id 和 create_time 由数据库自动处理）
 //! - PUT /api/policy_file?id=xxx - 修改指定的政策文件（仅 Admin 权限，通过 id 查找）
 //! - DELETE /api/policy_file?id=xxx - 删除指定的政策文件（仅 Admin 权限，通过 id 查找）
-//!
-//! ## 参数说明
-//! - GET 接口：必须提供  参数（字符串类型）
-//! - PUT/DELETE 接口：必须提供 uid=1000(zhao) gid=1000(zhao) groups=1000(zhao),4(adm),10(uucp),20(dialout),24(cdrom),25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),116(netdev),998(ollama),999(docker) 参数（整数类型）
+
 
 mod delete;
 mod get;

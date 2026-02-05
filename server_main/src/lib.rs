@@ -65,6 +65,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/user", user::register_router())
         .nest("/user", user::login_router())
         .nest("/user", user::modify_router())
+        .nest("/user", user::info_router())
         .nest("/user", user::apply_permission_router())
         .nest("/user", user::admin_manager_router())
         .nest("/ai_chat", ai_chat::ai_chat_router())
