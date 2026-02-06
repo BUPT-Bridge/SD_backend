@@ -4,7 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub mod token2user;
 pub mod user2token;
 
-pub const EXPIRATION_TIME: u64 = 36000; // 10 hour
+pub const EXPIRATION_TIME: u64 = 2592000; // 30 day
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {

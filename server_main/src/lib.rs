@@ -114,7 +114,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(state)
         .layer(TraceLayer::new_for_http());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3002").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
 
     axum::serve(listener, app).await?;
 
