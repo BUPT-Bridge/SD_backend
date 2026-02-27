@@ -10,7 +10,7 @@ use interface_types::proto::user::UserResponse;
 use sea_orm::{ActiveModelTrait, Set};
 use serde::Deserialize;
 use user_auth::db_exchange::User as AuthUser;
-use user_auth::db_exchange::user2token;
+use user_auth::db_exchange::{md5_hash_password, user2token};
 use user_auth::wx_auth::*;
 
 use crate::AppState;
@@ -52,8 +52,12 @@ async fn register(
         }
     };
 
-    // Insert or update the user in the database (currently only insert is implemented).
-    let created_user = match add_user_to_db(&state, &openid).await {
+    // Encrypt default password "123456" using MD5
+    let default_password = "123456";
+    let hashed_password = md5_hash_password(default_password);
+
+    // Insert or update the user in the database with default password.
+    let created_user = match add_user_to_db(&state, &openid, &hashed_password).await {
         Ok(u) => Some(u),
         Err(err) => {
             return Protobuf(UserResponse {
@@ -70,11 +74,16 @@ async fn register(
     })
 }
 
-async fn add_user_to_db(state: &AppState, openid: &str) -> Result<ProtoUser, String> {
+async fn add_user_to_db(
+    state: &AppState,
+    openid: &str,
+    password: &str,
+) -> Result<ProtoUser, String> {
     let db = state.database.clone();
 
     let active = user_entity::ActiveModel {
         open_id: Set(openid.to_string()),
+        password: Set(Some(password.to_string())),
         ..Default::default()
     };
 
@@ -92,6 +101,7 @@ async fn add_user_to_db(state: &AppState, openid: &str) -> Result<ProtoUser, Str
         is_important: model.is_important,
         avatar: model.avatar.clone(),
         permission: model.permission,
+        password: model.password.clone(),
     };
     let jwt_token = user2token(&user).unwrap();
 

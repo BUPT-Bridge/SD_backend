@@ -10,6 +10,7 @@ hmac = "0.12.1"
 sha2 = "0.10.8"
 reqwest = { version = "0.13.1", features = ["json"] }
 serde = { version = "1.0.228", features = ["derive"] }
+md-5 = "0.10.6"
 serde_json = "1.0.149"
 
 [dev-dependencies]

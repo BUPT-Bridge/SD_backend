@@ -40,6 +40,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(User::Permission).integer().default(1))
                     .col(ColumnDef::new(User::Name).string())
                     .col(ColumnDef::new(User::PhoneNumber).string())
+                    .col(ColumnDef::new(User::Password).string())
                     .col(ColumnDef::new(User::Address).string())
                     .col(ColumnDef::new(User::IsImportant).boolean().default(false))
                     .to_owned(),
@@ -68,4 +69,5 @@ pub enum User {
     IsImportant,
     Avatar,
     Permission,
+    Password,
 }

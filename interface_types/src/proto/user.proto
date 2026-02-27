@@ -16,11 +16,12 @@ package sd_backend.user;
 // }
 message UserRequest {
   // [Authorize::Admin && Authorize::User]
-  optional string target_openid = 10;
+  optional string token =1;
   optional string nickname = 2;
   optional string name = 3;
   optional string phone_number = 4;
-  optional string address = 5;
+  optional string password = 5;
+  optional string address = 6;
   // optional string community = 6;
   // [Authorize::Admin]
   optional string is_important = 7;
@@ -78,4 +79,26 @@ message AdminManagerResponse {
   repeated AdminManagedUser users = 1;
   int32 code = 2;
   string message = 3;
+}
+
+// PasswordLogin - 密码登录相关
+message PasswordLoginRequest {
+  string phone_number = 1;
+  string password = 2;
+}
+
+message PasswordLoginResponse {
+  optional User user = 1;
+  int32 code = 2;
+  string message = 3;
+}
+
+// ChangePassword - 修改密码相关
+message ChangePasswordRequest {
+  string password = 1; // 新密码（明文）
+}
+
+message ChangePasswordResponse {
+  int32 code = 1;
+  string message = 2;
 }

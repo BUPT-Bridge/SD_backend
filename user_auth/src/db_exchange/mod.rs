@@ -16,6 +16,7 @@ pub struct User {
     pub phone_number: Option<String>,
     pub address: Option<String>,
     pub is_important: Option<bool>,
+    pub password: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,5 +49,6 @@ pub fn expiration_timestamp() -> u64 {
     now_timestamp() + EXPIRATION_TIME
 }
 
+pub use crate::encryption::*;
 pub use token2user::*;
 pub use user2token::*;
