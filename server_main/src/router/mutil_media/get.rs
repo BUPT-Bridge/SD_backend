@@ -10,6 +10,8 @@ use db_manager::entity::mutil_media as mutil_media_entity;
 use interface_types::proto::mutil_media::{Media as ProtoMedia, MediaResponse};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::Deserialize;
+use std::path::PathBuf;
+use tokio::fs;
 use user_auth::db_exchange::{ExchangeError, token2user};
 use uuid::Uuid;
 
@@ -20,6 +22,9 @@ use crate::AppState;
 struct MediaQuery {
     /// 多媒体文件的 UUID
     uuid: String,
+    /// 是否为大文件下载（从本地文件系统读取）
+    #[serde(default)]
+    bigfile: bool,
 }
 
 /// 创建 mutil_media 的 GET 路由
@@ -134,7 +139,7 @@ async fn get_media_metadata(
     })
 }
 
-/// GET /api/mutil_media/download?uuid=xxx
+/// GET /api/mutil_media/download?uuid=xxx&bigfile=false
 ///
 /// 获取多媒体文件的二进制数据，直接返回文件内容和正确的 Content-Type
 ///
@@ -143,8 +148,11 @@ async fn get_media_metadata(
 ///
 /// 查询参数：
 /// - uuid: 必需，多媒体文件的 UUID
+/// - bigfile: 是否为大文件下载（可选，默认 false）
+///   - false: 从数据库读取文件（兼容原有逻辑）
+///   - true: 从本地 media 文件夹读取文件
 ///
-/// 示例：GET /api/mutil_media/download?uuid=xxx
+/// 示例：GET /api/mutil_media/download?uuid=xxx&bigfile=true
 async fn get_media_download(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -202,16 +210,33 @@ async fn get_media_download(
         }
     };
 
-    // 5. 提取文件类型和文件数据
+    // 5. 提取文件类型
     let media_type = media
         .r#type
         .unwrap_or("application/octet-stream".to_string());
-    let file_data = media.file.unwrap_or_default();
 
-    // 6. 根据 type 构建正确的 MIME 类型
+    // 6. 根据 bigfile 参数决定文件来源
+    let file_data = if params.bigfile {
+        // 大文件模式：从本地文件系统读取
+        match load_from_local_filesystem(&uuid, &media_type).await {
+            Ok(data) => data,
+            Err(err) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Failed to load file from filesystem: {}", err),
+                )
+                    .into_response();
+            }
+        }
+    } else {
+        // 普通模式：从数据库读取（兼容原有逻辑）
+        media.file.unwrap_or_default()
+    };
+
+    // 7. 根据 type 构建正确的 MIME 类型
     let content_type = determine_mime_type(&media_type);
 
-    // 5. 构建响应
+    // 8. 构建响应
     let mut headers = HeaderMap::new();
     headers.insert(header::CONTENT_TYPE, content_type.parse().unwrap());
     headers.insert(
@@ -221,8 +246,33 @@ async fn get_media_download(
             .unwrap(),
     );
 
-    // 7. 构建并返回响应
+    // 9. 构建并返回响应
     (headers, file_data).into_response()
+}
+
+/// 从本地文件系统读取文件
+///
+/// # Arguments
+/// * `uuid` - 文件的 UUID（文件名）
+/// * `media_type` - 文件类型（扩展名）
+///
+/// # Returns
+/// 成功返回文件数据，失败返回错误信息
+async fn load_from_local_filesystem(uuid: &Uuid, media_type: &str) -> Result<Vec<u8>, String> {
+    // 构建文件路径：media/{uuid}.{extension}
+    let filename = format!("{}.{}", uuid, media_type);
+    let file_path = PathBuf::from("media").join(&filename);
+
+    // 检查文件是否存在
+    if !file_path.exists() {
+        return Err(format!("File not found: {}", file_path.display()));
+    }
+
+    // 读取文件
+    match fs::read(&file_path).await {
+        Ok(data) => Ok(data),
+        Err(err) => Err(format!("Failed to read file: {}", err)),
+    }
 }
 
 /// 根据文件扩展名确定 MIME 类型

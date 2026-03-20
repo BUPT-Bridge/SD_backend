@@ -121,20 +121,23 @@ async fn modify_health_guide_type(
     if payload.type_sum != 0 {
         active.type_sum = Set(Some(payload.type_sum));
     }
-    if !payload.type_one.is_empty() {
+    if !payload.type_two.is_empty() {
         // 解析 JSON 字符串
-        match payload.type_one.parse::<Json>() {
+        match payload.type_two.parse::<Json>() {
             Ok(json) => {
-                active.type_one = Set(Some(json));
+                active.type_two = Set(Some(json));
             }
             Err(_) => {
                 return Protobuf(HealthGuideTypeResponse {
                     health_guide_types: vec![],
                     code: 400,
-                    message: "Invalid JSON format for type_one".to_string(),
+                    message: "Invalid JSON format for type_two".to_string(),
                 });
             }
         }
+    }
+    if !payload.description.is_empty() {
+        active.description = Set(Some(payload.description));
     }
 
     // 保留原主键
@@ -159,13 +162,13 @@ async fn modify_health_guide_type(
             type_name: target_updated.type_name.unwrap_or_default(),
             icon: target_updated.icon.unwrap_or_default(),
             type_sum: target_updated.type_sum.unwrap_or_default(),
-            type_one: target_updated
-                .type_one
+            type_two: target_updated
+                .type_two
                 .map(|json| json.to_string())
                 .unwrap_or_default(),
+            description: target_updated.description.unwrap_or_default(),
         }],
         code: 200,
         message: "Modify health guide type success".to_string(),
     })
 }
-

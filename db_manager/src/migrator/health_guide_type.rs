@@ -32,7 +32,8 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(HealthGuideType::TypeName).string())
                     .col(ColumnDef::new(HealthGuideType::Icon).integer())
                     .col(ColumnDef::new(HealthGuideType::TypeSum).integer())
-                    .col(ColumnDef::new(HealthGuideType::TypeOne).json())
+                    .col(ColumnDef::new(HealthGuideType::TypeTwo).json())
+                    .col(ColumnDef::new(HealthGuideType::Description).string())
                     .to_owned(),
             )
             .await
@@ -53,5 +54,6 @@ pub enum HealthGuideType {
     TypeName,
     Icon,
     TypeSum,
-    TypeOne,
+    TypeTwo,
+    Description,
 }

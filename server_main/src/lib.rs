@@ -1,6 +1,7 @@
 mod router;
 
 use axum::Router;
+use axum::extract::DefaultBodyLimit;
 use db_manager::migrator::Migrator;
 use db_manager::*;
 use dotenvy::dotenv;
@@ -112,6 +113,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .nest("/api", api_router)
         .with_state(state)
+        .layer(DefaultBodyLimit::max(1024 * 1024 * 1024)) // 1GB body limit for large file uploads
         .layer(TraceLayer::new_for_http());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();

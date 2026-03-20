@@ -70,16 +70,16 @@ async fn create_health_guide_type(
     }
 
     // 4) 解析 JSON 字符串
-    let type_one_json: Option<Json> = if payload.type_one.is_empty() {
+    let type_two_json: Option<Json> = if payload.type_two.is_empty() {
         None
     } else {
-        match payload.type_one.parse::<Json>() {
+        match payload.type_two.parse::<Json>() {
             Ok(json) => Some(json),
             Err(_) => {
                 return Protobuf(HealthGuideTypeResponse {
                     health_guide_types: vec![],
                     code: 400,
-                    message: "Invalid JSON format for type_one".to_string(),
+                    message: "Invalid JSON format for type_two".to_string(),
                 });
             }
         }
@@ -95,7 +95,12 @@ async fn create_health_guide_type(
         }),
         icon: Set(Some(payload.icon)),
         type_sum: Set(Some(payload.type_sum)),
-        type_one: Set(type_one_json),
+        type_two: Set(type_two_json),
+        description: Set(if payload.description.is_empty() {
+            None
+        } else {
+            Some(payload.description.clone())
+        }),
     };
 
     let db = state.database.clone();
@@ -117,10 +122,11 @@ async fn create_health_guide_type(
             type_name: inserted.type_name.unwrap_or_default(),
             icon: inserted.icon.unwrap_or_default(),
             type_sum: inserted.type_sum.unwrap_or_default(),
-            type_one: inserted
-                .type_one
+            type_two: inserted
+                .type_two
                 .map(|json| json.to_string())
                 .unwrap_or_default(),
+            description: inserted.description.unwrap_or_default(),
         }],
         code: 200,
         message: "Create health guide type success".to_string(),

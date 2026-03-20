@@ -4,7 +4,7 @@ use axum::{
     extract::State,
     http::{HeaderMap, Response, StatusCode, header},
     response::IntoResponse,
-    routing::get,
+    routing::post,
 };
 use axum_extra::protobuf::Protobuf;
 use db_manager::entity::feedback as feedback_entity;
@@ -16,10 +16,10 @@ use crate::AppState;
 
 /// 创建 feedback 导出路由
 pub fn router() -> Router<AppState> {
-    Router::new().route("/export", get(export_feedback))
+    Router::new().route("/export", post(export_feedback))
 }
 
-/// GET /api/feedback/export - 导出反馈（所有权限 0-3 都可以访问）
+/// POST /api/feedback/export - 导出反馈（所有权限 0-3 都可以访问）
 ///
 /// 传入 proto（FeedbackExportRequest），包含 start_time/end_time 时间戳
 /// 返回 Excel 文件流
@@ -51,7 +51,7 @@ async fn export_feedback(
 
     // 3) 权限校验：所有权限 0-3 都可以访问
     let user_permission = auth_user.permission.unwrap_or(0);
-    if user_permission == 3 {
+    if user_permission != 3 {
         return StatusCode::FORBIDDEN.into_response();
     }
 

@@ -48,4 +48,4 @@ if __name__ == "__main__":
     print("按 Ctrl+C 停止服务器\n")
 
     # 启动Flask应用，监听所有IP地址的5000端口
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5001, debug=False)

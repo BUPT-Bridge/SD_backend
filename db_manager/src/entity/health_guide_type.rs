@@ -10,7 +10,8 @@ pub struct Model {
     pub type_name: Option<String>,
     pub icon: Option<i32>,
     pub type_sum: Option<i32>,
-    pub type_one: Option<Json>,
+    pub type_two: Option<Json>,
+    pub description: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

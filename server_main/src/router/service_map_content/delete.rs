@@ -22,14 +22,11 @@ pub fn router() -> Router<AppState> {
 /// 查询参数
 #[derive(Debug, Deserialize)]
 struct ServiceMapContentParams {
-    /// 类型一（社区 ID）
-    type_one: Option<i32>,
-    /// 类型二（类型名称）
-    type_two: Option<String>,
+    /// 服务地图内容的 ID
+    id: i32,
 }
 
-/// DELETE /api/service_map_content?type_one=xxx&type_two=xxx - 删除服务地图内容（仅 Admin 权限可以访问）
-/// 必须提供 type_one 和 type_two 参数来筛选要删除的记录
+/// DELETE /api/service_map_content?id=xxx - 删除服务地图内容（仅 Admin 权限可以访问）
 async fn delete_service_map_content(
     State(state): State<AppState>,
     Query(params): Query<ServiceMapContentParams>,
@@ -83,34 +80,10 @@ async fn delete_service_map_content(
         });
     }
 
-    // 4) 检查必填参数
-    let type_one = match params.type_one {
-        Some(v) => v,
-        None => {
-            return Protobuf(ServiceMapContentResponse {
-                service_map_contents: vec![],
-                code: 400,
-                message: "Missing required parameter: type_one".to_string(),
-            });
-        }
-    };
-
-    let type_two = match params.type_two {
-        Some(v) if !v.is_empty() => v,
-        _ => {
-            return Protobuf(ServiceMapContentResponse {
-                service_map_contents: vec![],
-                code: 400,
-                message: "Missing required parameter: type_two".to_string(),
-            });
-        }
-    };
-
-    // 5) 查找要删除的服务地图内容
+    // 4) 查找要删除的服务地图内容
     let db = state.database.clone();
     let service_map_content_to_delete = match service_map_content_entity::Entity::find()
-        .filter(service_map_content_entity::Column::TypeOne.eq(type_one))
-        .filter(service_map_content_entity::Column::TypeTwo.eq(&type_two))
+        .filter(service_map_content_entity::Column::Id.eq(params.id))
         .one(db.as_ref())
         .await
     {
@@ -119,10 +92,7 @@ async fn delete_service_map_content(
             return Protobuf(ServiceMapContentResponse {
                 service_map_contents: vec![],
                 code: 404,
-                message: format!(
-                    "Service map content with type_one '{}' and type_two '{}' not found",
-                    type_one, type_two
-                ),
+                message: format!("Service map content with id '{}' not found", params.id),
             });
         }
         Err(err) => {
@@ -134,7 +104,7 @@ async fn delete_service_map_content(
         }
     };
 
-    // 6) 执行删除
+    // 5) 执行删除
     match service_map_content_entity::Entity::delete_by_id(service_map_content_to_delete.id)
         .exec(db.as_ref())
         .await
@@ -149,7 +119,7 @@ async fn delete_service_map_content(
         }
     };
 
-    // 7) 返回成功响应
+    // 6) 返回成功响应
     Protobuf(ServiceMapContentResponse {
         service_map_contents: vec![],
         code: 200,

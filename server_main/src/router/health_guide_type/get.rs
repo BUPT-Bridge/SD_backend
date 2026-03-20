@@ -40,7 +40,8 @@ async fn get_health_guide_type(State(state): State<AppState>) -> Protobuf<Health
             type_name: t.type_name.unwrap_or_default(),
             icon: t.icon.unwrap_or_default(),
             type_sum: t.type_sum.unwrap_or_default(),
-            type_one: t.type_one.map(|json| json.to_string()).unwrap_or_default(),
+            type_two: t.type_two.map(|json| json.to_string()).unwrap_or_default(),
+            description: t.description.unwrap_or_default(),
         })
         .collect();
 

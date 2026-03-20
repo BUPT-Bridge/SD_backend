@@ -8,6 +8,8 @@ use axum::{
 use db_manager::entity::mutil_media as mutil_media_entity;
 use sea_orm::ActiveModelTrait;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
+use tokio::{fs, io::AsyncWriteExt};
 use user_auth::db_exchange::{ExchangeError, token2user};
 use uuid::Uuid;
 
@@ -29,6 +31,9 @@ struct UploadParams {
     /// 是否作为头像上传（自动压缩为 webp 并裁剪为 120x120）
     #[serde(default)]
     avatar: bool,
+    /// 是否为大文件上传（保存到本地文件系统）
+    #[serde(default)]
+    bigfile: bool,
 }
 
 /// JSON 响应结构
@@ -54,37 +59,6 @@ struct JsonMedia {
 /// POST /api/mutil_media
 ///
 /// 上传多媒体文件（multipart/form-data 格式）
-///
-/// Headers:
-/// - Authorization: Bearer token（必需，权限 0-3 均可）
-///
-/// Query 参数：
-/// - compress: 是否压缩为 webp 格式（可选，默认 false）
-/// - avatar: 是否作为头像上传（可选，默认 false，自动压缩为 webp 并裁剪为 120x120）
-///
-/// 请求体（multipart/form-data）：
-/// - file: 文件数据（必需）
-/// - filename: 文件名（可选，默认使用原始文件名）
-///
-/// 返回（JSON 格式）：
-/// ```json
-/// {
-///   "media": {
-///     "uuid": "xxx",
-///     "type": "webp"
-///   },
-///   "code": 200,
-///   "message": "Upload media success"
-/// }
-/// ```
-///
-/// 注意：
-/// - 需要有效的 token（权限 0-3 均可）
-/// - 使用 multipart/form-data 格式上传文件
-/// - compress 参数：压缩图片为 webp 格式，后缀名改为 .webp
-/// - avatar 参数：压缩为 webp 后裁剪为 120x120 像素
-/// - 支持 jpg、png、jpeg、gif 等常见图片格式
-/// - 非图片文件不受 compress/avatar 参数影响
 async fn upload_media(
     State(state): State<AppState>,
     Query(params): Query<UploadParams>,
@@ -114,9 +88,7 @@ async fn upload_media(
 
     // 2) 解析 token，获取用户信息
     match token2user(&token) {
-        Ok(_) => {
-            // Token 验证成功，权限 0-3 均可访问，继续执行上传逻辑
-        }
+        Ok(_) => {}
         Err(err) => {
             let msg = match err {
                 ExchangeError::InvalidToken => "Invalid token".to_string(),
@@ -131,7 +103,10 @@ async fn upload_media(
         }
     };
 
-    // 3) 从 multipart 中提取文件数据和文件名
+    // 3) 生成 UUID
+    let uuid = Uuid::new_v4();
+
+    // 4) 从 multipart 中提取文件数据和文件名
     let mut file_data: Option<Vec<u8>> = None;
     let mut filename: Option<String> = None;
 
@@ -146,17 +121,69 @@ async fn upload_media(
                         filename = Some(original_name.to_string());
                     }
                 }
-                // 读取文件数据
-                match field.bytes().await {
-                    Ok(bytes) => {
-                        file_data = Some(bytes.to_vec());
+
+                // 判断是否需要流式上传
+                if params.bigfile && !params.compress && !params.avatar {
+                    // 大文件流式上传：直接写入磁盘
+                    let media_type =
+                        extract_file_type(filename.as_ref().unwrap_or(&"unknown".to_string()));
+
+                    match save_stream_to_file(&uuid, field, &media_type).await {
+                        Ok(_) => {
+                            // 文件保存成功，插入数据库记录
+                            let db = state.database.clone();
+                            let new_media = mutil_media_entity::ActiveModel {
+                                uuid: sea_orm::Set(Some(uuid)),
+                                file: sea_orm::Set(None),
+                                r#type: sea_orm::Set(Some(media_type.clone())),
+                                ..Default::default()
+                            };
+
+                            match new_media.insert(db.as_ref()).await {
+                                Ok(inserted_media) => {
+                                    return Json(JsonMediaResponse {
+                                        media: Some(JsonMedia {
+                                            uuid: inserted_media
+                                                .uuid
+                                                .map(|u| u.to_string())
+                                                .unwrap_or_default(),
+                                            r#type: inserted_media.r#type.unwrap_or_default(),
+                                        }),
+                                        code: 200,
+                                        message: "Upload media success (bigfile streaming)"
+                                            .to_string(),
+                                    });
+                                }
+                                Err(err) => {
+                                    return Json(JsonMediaResponse {
+                                        media: None,
+                                        code: 500,
+                                        message: format!("Failed to insert media record: {}", err),
+                                    });
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            return Json(JsonMediaResponse {
+                                media: None,
+                                code: 500,
+                                message: format!("Failed to save file to filesystem: {}", err),
+                            });
+                        }
                     }
-                    Err(err) => {
-                        return Json(JsonMediaResponse {
-                            media: None,
-                            code: 400,
-                            message: format!("Failed to read file data: {}", err),
-                        });
+                } else {
+                    // 小文件或需要压缩：读取到内存
+                    match field.bytes().await {
+                        Ok(bytes) => {
+                            file_data = Some(bytes.to_vec());
+                        }
+                        Err(err) => {
+                            return Json(JsonMediaResponse {
+                                media: None,
+                                code: 400,
+                                message: format!("Failed to read file data: {}", err),
+                            });
+                        }
                     }
                 }
             }
@@ -181,7 +208,10 @@ async fn upload_media(
         }
     }
 
-    // 4) 验证文件数据存在
+    // 5) 使用文件名
+    let filename = filename.unwrap_or_else(|| "unknown".to_string());
+
+    // 6) 验证文件数据存在（小文件或需要压缩的情况）
     let file_data = match file_data {
         Some(data) => data,
         None => {
@@ -193,15 +223,8 @@ async fn upload_media(
         }
     };
 
-    // 5) 使用文件名（优先使用 filename 字段，否则使用文件的原始文件名）
-    let filename = filename.unwrap_or_else(|| {
-        // 从 multipart 字段中获取原始文件名
-        "unknown".to_string()
-    });
-
-    // 6) 处理图片（如果启用了 compress 或 avatar 参数）
+    // 7) 处理图片（如果启用了 compress 或 avatar 参数）
     let (processed_data, processed_filename) = if params.avatar {
-        // 头像模式：压缩为 webp 并裁剪为 120x120
         match process_avatar(&file_data, &filename) {
             Ok((data, name)) => (data, name),
             Err(err) => {
@@ -213,7 +236,6 @@ async fn upload_media(
             }
         }
     } else if params.compress {
-        // 压缩模式：转换为 webp 格式
         match compress_to_webp(&file_data, &filename) {
             Ok((data, name)) => (data, name),
             Err(err) => {
@@ -225,30 +247,62 @@ async fn upload_media(
             }
         }
     } else {
-        // 不处理，使用原始数据
         (file_data, filename)
     };
 
-    // 7) 从文件名提取文件类型（后缀）
-    let media_type = extract_file_type(&processed_filename);
+    // 8) 更新媒体类型
+    let final_media_type = extract_file_type(&processed_filename);
 
-    // 8) 生成 UUID
-    let uuid = Uuid::new_v4();
+    // 9) 根据 bigfile 参数决定存储方式
+    if params.bigfile {
+        // 大文件模式：保存到本地文件系统
+        match save_to_local_filesystem(&uuid, &processed_data, &final_media_type).await {
+            Ok(_) => {
+                let db = state.database.clone();
+                let new_media = mutil_media_entity::ActiveModel {
+                    uuid: sea_orm::Set(Some(uuid)),
+                    file: sea_orm::Set(None),
+                    r#type: sea_orm::Set(Some(final_media_type.clone())),
+                    ..Default::default()
+                };
 
-    // 9) 创建 ActiveModel 并插入数据库
-    let db = state.database.clone();
-    let new_media = mutil_media_entity::ActiveModel {
-        uuid: sea_orm::Set(Some(uuid)),
-        file: sea_orm::Set(Some(processed_data)),
-        r#type: sea_orm::Set(Some(media_type.clone())),
-        ..Default::default()
-    };
+                match new_media.insert(db.as_ref()).await {
+                    Ok(inserted_media) => Json(JsonMediaResponse {
+                        media: Some(JsonMedia {
+                            uuid: inserted_media
+                                .uuid
+                                .map(|u| u.to_string())
+                                .unwrap_or_default(),
+                            r#type: inserted_media.r#type.unwrap_or_default(),
+                        }),
+                        code: 200,
+                        message: "Upload media success (bigfile)".to_string(),
+                    }),
+                    Err(err) => Json(JsonMediaResponse {
+                        media: None,
+                        code: 500,
+                        message: format!("Failed to insert media record: {}", err),
+                    }),
+                }
+            }
+            Err(err) => Json(JsonMediaResponse {
+                media: None,
+                code: 500,
+                message: format!("Failed to save file to filesystem: {}", err),
+            }),
+        }
+    } else {
+        // 普通模式：保存到数据库
+        let db = state.database.clone();
+        let new_media = mutil_media_entity::ActiveModel {
+            uuid: sea_orm::Set(Some(uuid)),
+            file: sea_orm::Set(Some(processed_data)),
+            r#type: sea_orm::Set(Some(final_media_type.clone())),
+            ..Default::default()
+        };
 
-    // 10) 执行插入操作
-    match new_media.insert(db.as_ref()).await {
-        Ok(inserted_media) => {
-            // 插入成功，返回 JSON 响应
-            Json(JsonMediaResponse {
+        match new_media.insert(db.as_ref()).await {
+            Ok(inserted_media) => Json(JsonMediaResponse {
                 media: Some(JsonMedia {
                     uuid: inserted_media
                         .uuid
@@ -258,15 +312,70 @@ async fn upload_media(
                 }),
                 code: 200,
                 message: "Upload media success".to_string(),
-            })
-        }
-        Err(err) => {
-            // 插入失败，返回错误响应
-            Json(JsonMediaResponse {
+            }),
+            Err(err) => Json(JsonMediaResponse {
                 media: None,
                 code: 500,
                 message: format!("Failed to upload media: {}", err),
-            })
+            }),
         }
     }
+}
+
+/// 流式保存文件到本地文件系统
+async fn save_stream_to_file(
+    uuid: &Uuid,
+    mut field: axum::extract::multipart::Field<'_>,
+    media_type: &str,
+) -> Result<(), String> {
+    let media_dir = PathBuf::from("media");
+
+    fs::create_dir_all(&media_dir)
+        .await
+        .map_err(|err| format!("Failed to create media directory: {}", err))?;
+
+    let filename = format!("{}.{}", uuid, media_type);
+    let file_path = media_dir.join(&filename);
+
+    let mut file = fs::File::create(&file_path)
+        .await
+        .map_err(|err| format!("Failed to create file: {}", err))?;
+
+    while let Some(chunk) = field
+        .chunk()
+        .await
+        .map_err(|err| format!("Failed to read chunk: {}", err))?
+    {
+        file.write_all(&chunk)
+            .await
+            .map_err(|err| format!("Failed to write chunk: {}", err))?;
+    }
+
+    file.flush()
+        .await
+        .map_err(|err| format!("Failed to flush file: {}", err))?;
+
+    Ok(())
+}
+
+/// 将文件保存到本地文件系统
+async fn save_to_local_filesystem(
+    uuid: &Uuid,
+    data: &[u8],
+    media_type: &str,
+) -> Result<(), String> {
+    let media_dir = PathBuf::from("media");
+
+    fs::create_dir_all(&media_dir)
+        .await
+        .map_err(|err| format!("Failed to create media directory: {}", err))?;
+
+    let filename = format!("{}.{}", uuid, media_type);
+    let file_path = media_dir.join(&filename);
+
+    fs::write(&file_path, data)
+        .await
+        .map_err(|err| format!("Failed to write file: {}", err))?;
+
+    Ok(())
 }

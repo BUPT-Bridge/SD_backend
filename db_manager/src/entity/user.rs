@@ -14,8 +14,8 @@ pub struct Model {
     pub permission: Option<i32>,
     pub name: Option<String>,
     pub phone_number: Option<String>,
-    pub address: Option<String>,
     pub password: Option<String>,
+    pub address: Option<String>,
     pub is_important: Option<bool>,
 }
 

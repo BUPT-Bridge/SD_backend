@@ -7,14 +7,16 @@ message HealthGuideType {
   string type_name = 2;
   int32 icon = 3;
   int32 type_sum = 4;
-  string type_one = 5; // JSON string
+  string type_two = 5; // JSON string
+  string description = 6; // 新增字段
 }
 
 message HealthGuideTypeRequest {
   string type_name = 1;
   int32 icon = 2;
   int32 type_sum = 3;
-  string type_one = 4; // JSON string
+  string type_two = 4; // JSON string
+  string description = 5; // 新增字段
 }
 
 message HealthGuideTypeResponse {

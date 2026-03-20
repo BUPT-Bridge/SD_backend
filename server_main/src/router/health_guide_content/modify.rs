@@ -27,14 +27,11 @@ pub fn router() -> Router<AppState> {
 /// 查询参数
 #[derive(Debug, Deserialize)]
 struct HealthGuideContentParams {
-    /// 类型一（一级类型 ID）
-    type_one: Option<i32>,
-    /// 类型二（二级类型名称）
-    type_two: Option<String>,
+    /// 健康#{@quote}指南内容的 ID
+    id: i32,
 }
 
-/// PUT /api/health_guide_content?type_one=xxx&type_two=xxx - 修改健康指南内容（仅 Admin 权限可以访问）
-/// 必须提供 type_one 和 type_two 参数来筛选要修改的记录
+/// PUT /api/health_guide_content?id=xxx - 修改健康指南内容（仅 Admin 权限可以访问）
 async fn modify_health_guide_content(
     State(state): State<AppState>,
     Query(params): Query<HealthGuideContentParams>,
@@ -89,34 +86,10 @@ async fn modify_health_guide_content(
         });
     }
 
-    // 4) 检查必填参数
-    let type_one = match params.type_one {
-        Some(v) => v,
-        None => {
-            return Protobuf(HealthGuideContentResponse {
-                health_guide_contents: vec![],
-                code: 400,
-                message: "Missing required parameter: type_one".to_string(),
-            });
-        }
-    };
-
-    let type_two = match params.type_two {
-        Some(v) if !v.is_empty() => v,
-        _ => {
-            return Protobuf(HealthGuideContentResponse {
-                health_guide_contents: vec![],
-                code: 400,
-                message: "Missing required parameter: type_two".to_string(),
-            });
-        }
-    };
-
-    // 5) 查找目标健康指南内容
+    // 4) 查找目标健康指南内容
     let db = state.database.clone();
     let target = match health_guide_content_entity::Entity::find()
-        .filter(health_guide_content_entity::Column::TypeOne.eq(type_one))
-        .filter(health_guide_content_entity::Column::TypeTwo.eq(&type_two))
+        .filter(health_guide_content_entity::Column::Id.eq(params.id))
         .one(db.as_ref())
         .await
     {
@@ -137,7 +110,7 @@ async fn modify_health_guide_content(
         }
     };
 
-    // 6) 应用部分更新：payload 中非空/非零 的字段覆盖，其他保持不变
+    // 5) 应用部分更新：payload 中非空/非零 的字段覆盖，其他保持不变
     let mut active: health_guide_content_entity::ActiveModel = target.clone().into();
 
     if payload.type_one != 0 {
@@ -165,7 +138,7 @@ async fn modify_health_guide_content(
     // 保留原主键
     active.id = ActiveValue::Unchanged(target.id);
 
-    // 7) 更新数据库
+    // 6) 更新数据库
     let target_updated = match active.update(db.as_ref()).await {
         Ok(m) => m,
         Err(err) => {
@@ -177,7 +150,7 @@ async fn modify_health_guide_content(
         }
     };
 
-    // 8) 返回更新后的健康指南内容
+    // 7) 返回更新后的健康指南内容
     Protobuf(HealthGuideContentResponse {
         health_guide_contents: vec![ProtoHealthGuideContent {
             id: target_updated.id,
