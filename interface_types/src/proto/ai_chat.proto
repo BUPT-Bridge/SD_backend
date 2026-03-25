@@ -2,21 +2,101 @@ syntax = "proto3";
 
 package sd_backend.ai_chat;
 
-// AI Chat information
-message AiChat {
-  int32 id = 1;
-  optional string index = 2;
+// ==================== 消息类型枚举 ====================
+
+// 消息类型
+enum MessageType {
+  TEXT = 0; // 文本消息
+  IMAGE = 1; // 图片消息
+  VOICE = 2; // 语音消息
 }
 
-// Request for creating AI chat
-message AiChatRequest {
-  optional string index = 1;
-  optional string long_content = 2;
+// ==================== 实体消息 ====================
+
+// AI Chat 单条消息记录（一问一答）
+message AiChatMessage {
+  int32 id = 1; // 消息ID
+  string session_id = 2; // 对话会话ID
+  string openid = 3; // 用户openid
+  string title = 4; // 对话标题
+  string user_message = 5; // 用户发送的消息
+  string ai_response = 6; // AI回复的内容
+  MessageType message_type = 7; // 消息类型
+  int64 created_at = 8; // 创建时间戳（秒）
+  int64 updated_at = 9; // 更新时间戳（秒）
 }
 
-// Response for AI chat operations
-message AiChatResponse {
-  optional AiChat ai_chat = 1;
-  int32 code = 2;
-  string message = 3;
+// 对话会话信息（用于会话列表）
+message AiChatSession {
+  string session_id = 1; // 会话ID
+  string openid = 2; // 用户openid
+  string title = 3; // 会话标题
+  int32 message_count = 4; // 消息数量
+  int64 created_at = 5; // 创建时间戳
+  int64 last_message_at = 6; // 最后一条消息时间
+}
+
+// ==================== 请求消息 ====================
+
+// 创建/保存聊天记录请求
+message SaveChatRequest {
+  string session_id = 1; // 对话会话ID（新对话传空字符串）
+  string title = 2; // 对话标题（新对话时必填）
+  string user_message = 3; // 用户发送的消息
+  string ai_response = 4; // AI回复的内容
+  MessageType message_type = 5; // 消息类型（默认TEXT）
+}
+
+// 获取单个会话详情请求（获取该会话下所有消息）
+message GetSessionRequest {
+  string session_id = 1; // 会话ID
+}
+
+// 获取会话列表请求
+message GetSessionListRequest {
+  int32 page = 1; // 页码（从1开始）
+  int32 page_size = 2; // 每页数量（默认20）
+}
+
+// 删除会话请求
+message DeleteSessionRequest {
+  string session_id = 1; // 要删除的会话ID
+}
+
+// ==================== 响应消息 ====================
+
+// 保存聊天记录响应
+message SaveChatResponse {
+  AiChatMessage message = 1; // 保存的消息记录
+  string session_id = 2; // 会话ID
+  int32 code = 3; // 状态码：200成功，其他失败
+  string message_info = 4; // 提示信息
+}
+
+// 获取单个会话详情响应（包含该会话的所有消息）
+message GetSessionResponse {
+  string session_id = 1; // 会话ID
+  string title = 2; // 会话标题
+  string openid = 3; // 用户openid
+  repeated AiChatMessage messages = 4; // 该会话下的所有消息列表
+  int32 total_messages = 5; // 消息总数
+  int64 created_at = 6; // 会话创建时间（第一条消息时间）
+  int64 last_message_at = 7; // 最后一条消息时间
+  int32 code = 8; // 状态码
+  string message = 9; // 提示信息
+}
+
+// 获取会话列表响应
+message GetSessionListResponse {
+  repeated AiChatSession sessions = 1; // 会话列表
+  int32 total = 2; // 总会话数
+  int32 code = 3; // 状态码
+  string message = 4; // 提示信息
+}
+
+// 通用操作响应
+message ChatOperationResponse {
+  bool success = 1; // 是否成功
+  int32 code = 2; // 状态码
+  string message = 3; // 提示信息
 }

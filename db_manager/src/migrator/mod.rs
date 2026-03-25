@@ -2,7 +2,9 @@
 
 use sea_orm_migration::prelude::*;
 
+// 注意：旧的 ai_chat 迁移已被 ai_chat_v2 替代
 pub mod ai_chat;
+pub mod ai_chat_v2;
 pub mod community_service;
 pub mod detail_meal;
 pub mod dinner_provider;
@@ -41,7 +43,8 @@ impl MigratorTrait for Migrator {
             Box::new(service_map_content::Migration),
             Box::new(feedback::Migration),
             Box::new(user::Migration),
-            Box::new(ai_chat::Migration),
+            Box::new(ai_chat::Migration), // 已迁移到 ai_chat_v2
+            Box::new(ai_chat_v2::Migration),
             Box::new(mutil_media::Migration),
         ]
     }

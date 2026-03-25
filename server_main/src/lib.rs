@@ -56,7 +56,9 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .init();
     let database = build_database_connection().await;
 
-    Migrator::refresh(&database).await?;
+    // 执行数据库迁移（up 模式：只应用新迁移，不会删除已有数据）
+    // 注意：不要使用 refresh()，它会删除所有表！
+    Migrator::up(&database, None).await?;
 
     let state = AppState {
         database: Arc::new(database),
