@@ -3416,6 +3416,7 @@ dependencies = [
  "serde",
  "sha2",
  "tokio",
+ "tokio-util",
  "tower-http",
  "tracing",
  "tracing-subscriber",
