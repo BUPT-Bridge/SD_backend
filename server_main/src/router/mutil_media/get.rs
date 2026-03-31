@@ -114,7 +114,7 @@ pub fn router() -> Router<AppState> {
 /// 用于关联表查询，获取 UUID 和类型
 ///
 /// Headers:
-/// - Authorization: Bearer token（可选，携带时会验证）
+/// - Authorization: token（可选，不需要 `Bearer ` 前缀；携带时会验证）
 ///
 /// 查询参数：
 /// - uuid: 必需，多媒体文件的 UUID
@@ -178,7 +178,7 @@ async fn get_media_metadata(
 /// 获取多媒体文件的二进制数据，直接返回文件内容和正确的 Content-Type
 ///
 /// Headers:
-/// - Authorization: Bearer token（bigfile=true 时必需，bigfile=false 时可选）
+/// - Authorization: token（bigfile=true 时必需，bigfile=false 时可选；不需要 `Bearer ` 前缀）
 /// - Range: 可选，支持分块下载视频文件，格式: bytes=start-end
 ///
 /// 查询参数：
