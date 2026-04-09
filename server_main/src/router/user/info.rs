@@ -11,10 +11,8 @@ pub fn router() -> Router<AppState> {
     Router::new().route("/info", get(info))
 }
 
-async fn info(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> Protobuf<UserResponse> {
+async fn info(State(state): State<AppState>, headers: HeaderMap) -> Protobuf<UserResponse> {
+    let x_api_key = std::env::var("SERVER_X_API_KEY").unwrap_or_default();
     // 1) 解析 token，拿到用户 openid
     let token: &str = if let Some(token) = headers.get("Authorization") {
         token.to_str().unwrap()
@@ -80,6 +78,7 @@ async fn info(
             is_important: user.is_important.map(|b| b.to_string()),
             avatar: user.avatar,
             permission: user.permission.map(|p| p.to_string()),
+            x_api_key: Some(x_api_key),
         }),
         code: 200,
         message: "success".to_string(),

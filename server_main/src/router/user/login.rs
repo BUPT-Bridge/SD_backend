@@ -87,6 +87,7 @@ async fn password_login(
     let db = state.database.clone();
     let phone_number = payload.phone_number;
     let password = payload.password;
+    let x_api_key = std::env::var("SERVER_X_API_KEY").unwrap_or_default();
 
     // Hash the password using MD5
     let hashed_password = md5_hash_password(&password);
@@ -167,6 +168,7 @@ async fn password_login(
         is_important: user_model.is_important.map(|b| b.to_string()),
         avatar: user_model.avatar,
         permission: user_model.permission.map(|p| p.to_string()),
+        x_api_key: Some(x_api_key),
     };
 
     Protobuf(PasswordLoginResponse {
@@ -264,6 +266,7 @@ async fn change_password(
 
 async fn query_user_in_db(state: &AppState, openid: &str) -> Result<ProtoUser, String> {
     let db = state.database.clone();
+    let x_api_key = std::env::var("SERVER_X_API_KEY").map_err(|e| e.to_string())?;
 
     let user_queryed_result = user_entity::Entity::find()
         .filter(user_entity::Column::OpenId.eq(openid))
@@ -298,5 +301,6 @@ async fn query_user_in_db(state: &AppState, openid: &str) -> Result<ProtoUser, S
         is_important: model.is_important.map(|b| b.to_string()),
         avatar: model.avatar,
         permission: model.permission.map(|p| p.to_string()),
+        x_api_key: Some(x_api_key),
     })
 }

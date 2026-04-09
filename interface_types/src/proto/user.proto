@@ -16,7 +16,7 @@ package sd_backend.user;
 // }
 message UserRequest {
   // [Authorize::Admin && Authorize::User]
-  optional string token =1;
+  optional string token = 1;
   optional string nickname = 2;
   optional string name = 3;
   optional string phone_number = 4;
@@ -42,6 +42,7 @@ message User {
   optional string is_important = 7;
   optional string avatar = 8;
   optional string permission = 9;
+  optional string x_api_key = 10;
 }
 
 message UserResponse {

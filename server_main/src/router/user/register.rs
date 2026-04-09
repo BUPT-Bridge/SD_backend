@@ -80,6 +80,7 @@ async fn add_user_to_db(
     password: &str,
 ) -> Result<ProtoUser, String> {
     let db = state.database.clone();
+    let x_api_key = std::env::var("SERVER_X_API_KEY").map_err(|e| e.to_string())?;
 
     let active = user_entity::ActiveModel {
         open_id: Set(openid.to_string()),
@@ -114,5 +115,6 @@ async fn add_user_to_db(
         is_important: model.is_important.map(|b| b.to_string()),
         avatar: model.avatar,
         permission: model.permission.map(|p| p.to_string()),
+        x_api_key: Some(x_api_key),
     })
 }

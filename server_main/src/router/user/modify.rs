@@ -147,6 +147,7 @@ async fn modify(
             is_important: updated_user.is_important.map(|b| b.to_string()),
             avatar: updated_user.avatar,
             permission: updated_user.permission.map(|p| p.to_string()),
+            x_api_key: None,
         }),
         code: 200,
         message: "modify success".to_string(),
